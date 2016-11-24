@@ -333,13 +333,22 @@ class Controller extends \Grav\Plugin\Login\Controller
                 'email'    => $data['email'],
                 'lang'     => $language,
             ]);
+            $user->save();
+        }
 
+        // Check linked user
+        $linked_username = $this->grav['config']->get('accounts.linked_accounts.'.$username);
+        if( $linked_username ){
+            $linked_user = User::load($linked_username);
+            if( $linked_user->exists() ){
+                $user = $linked_user;
+            }
+        }
+
+        // flag authenticated
+        if( $user->exists() ){
             $authenticated = true;
             $user->authenticated = true;
-            $user->save();
-
-        } else {
-            $authenticated = $user->authenticate($password);
         }
 
         // Store user in session
