@@ -47,7 +47,7 @@ class Controller extends \Grav\Plugin\Login\Controller
     protected $scopes = [
         'github'   => ['user'],
         'google'   => ['userinfo_email', 'userinfo_profile'],
-        'facebook' => ['public_profile']
+        'facebook' => ['public_profile','email']
     ];
 
     /**
@@ -209,7 +209,7 @@ class Controller extends \Grav\Plugin\Login\Controller
     {
         return $this->genericOAuthProvider(function () {
             // Send a request now that we have access token
-            $data = json_decode($this->service->request('/me'), true);
+            $data = json_decode($this->service->request('/me?fields=id,name,email'), true);
             $email = isset($data['email']) ? $data['email'] : '';
 
             $dataUser = [
