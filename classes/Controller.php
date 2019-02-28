@@ -400,11 +400,25 @@ class Controller extends \Grav\Plugin\Login\Controller
             $user->save();
 
         } else {
+            // An authenticate with id as password is trival
+            // However keep this to emphasis possible security issue for furture changes and keep the track 
             $authenticated = $user->authenticate($password);
             // Save new email if different.
             if( $authenticated && $data['email'] != $user->get('email') ){
                 $user->set('email', $data['email'] );
                 $user->save();
+            }
+        }
+
+        // Check liked user and chage current user with it if it's possible
+        if( $authenticated ){
+            $linked_username = $this->grav['config']->get('accounts.linked_accounts.'.$username);
+            if( $linked_username ){
+                $linked_user = User::load($linked_username);
+                if( $linked_user->exists() ){
+                    $user = $linked_user;
+                    $user->authenticated = true;
+                }
             }
         }
 
